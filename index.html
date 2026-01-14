@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Advanced Proxy Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+header {
+  padding: 20px;
+  text-align: center;
+  background: rgba(0,0,0,0.2);
+  backdrop-filter: blur(10px);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 2em;
+  letter-spacing: 2px;
+}
+
+#controls {
+  display: flex;
+  padding: 20px;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+input[type=text] {
+  flex: 1;
+  min-width: 300px;
+  padding: 12px 20px;
+  font-size: 1em;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  transition: all 0.2s;
+}
+
+input[type=text]:focus {
+  box-shadow: 0 0 10px #fff3;
+}
+
+button {
+  padding: 12px 24px;
+  font-size: 1em;
+  border: none;
+  border-radius: 8px;
+  background-color: #ff6f61;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background-color: #ff3b2e;
+}
+
+#iframe-container {
+  flex: 1;
+  display: flex;
+  margin: 0 20px 20px 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+  background: #fff;
+}
+
+#proxyFrame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  flex-grow: 1;
+}
+
+#loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.8);
+  padding: 20px 40px;
+  border-radius: 10px;
+  display: none;
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #fff;
+  z-index: 9999;
+}
+
+@keyframes spin {
+  0% {transform: rotate(0deg);}
+  100% {transform: rotate(360deg);}
+}
+
+#spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #fff;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🕸️ Advanced Proxy</h1>
+  <p style="margin-top: 10px;">Enter URL below to browse through our proxy</p>
+</header>
+
+<div id="controls">
+  <input type="text" id="urlInput" placeholder="https://example.com" />
+  <button id="goBtn">Go</button>
+</div>
+
+<div id="iframe-container">
+  <div id="loading"><div id="spinner"></div></div>
+  <iframe id="proxyFrame" src=""></iframe>
+</div>
+
+<script>
+  const goBtn = document.getElementById('goBtn');
+  const urlInput = document.getElementById('urlInput');
+  const iframe = document.getElementById('proxyFrame');
+  const loading = document.getElementById('loading');
+
+  // Your proxy API endpoint (replace with your actual deployed URL)
+  const proxyAPI = 'https://your-vercel-project.vercel.app/api/proxy';
+
+  function showLoading(show) {
+    loading.style.display = show ? 'block' : 'none';
+  }
+
+  goBtn.onclick = () => {
+    let url = urlInput.value.trim();
+    if (!url) {
+      alert('Please enter a URL');
+      return;
+    }
+    if (!url.startsWith('http')) {
+      url = 'https://' + url;
+    }
+
+    // Show loader
+    showLoading(true);
+
+    // Build the proxy URL
+    const fetchUrl = `${proxyAPI}?url=${encodeURIComponent(url)}`;
+
+    // Update iframe src to proxy URL
+    iframe.src = fetchUrl;
+
+    // Wait for load event
+    iframe.onload = () => {
+      showLoading(false);
+    };
+  };
+</script>
+
+</body>
+</html>
