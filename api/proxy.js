@@ -1,6 +1,6 @@
-import fetch from 'node-fetch';
+const fetch = require('node-fetch');
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   const { url } = req.query;
 
   if (!url) {
@@ -18,15 +18,13 @@ export default async function handler(req, res) {
       body: req.method !== 'GET' && req.method !== 'HEAD' ? req.body : undefined,
     });
 
-    // Set response headers
     response.headers.forEach((value, key) => {
       res.setHeader(key, value);
     });
 
-    // Send the response back
     res.status(response.status);
     response.body.pipe(res);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-}
+};
